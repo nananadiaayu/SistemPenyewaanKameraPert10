@@ -1,18 +1,22 @@
 package com.mycompany.sistempenyewaankamera;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.InputMismatchException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class SistemPenyewaanKamera {
 
     static Scanner input = new Scanner(System.in);
 
-    static Kamera[] daftarKamera = new Kamera[100];
-
-    static int jumlahKamera = 0;
+    static ArrayList<Kamera> daftarKamera = new ArrayList<>();
+    static HashMap<String, String> daftarPelanggan = new HashMap<>();
 
     public static void main(String[] args) {
 
         tambahDataAwal();
+        tambahDataPelanggan();
 
         int pilihan;
 
@@ -28,11 +32,19 @@ public class SistemPenyewaanKamera {
             System.out.println("5. Ubah Status Kamera");
             System.out.println("6. Keluar");
             System.out.println("7. Pengecekan Kamera");
+            System.out.println("8. Kelola Data Pelanggan");
+            System.out.println("9. Cari Kamera (Exception)");
             System.out.println("==============================================");
             System.out.print("Pilih menu: ");
 
-            pilihan = input.nextInt();
-            input.nextLine();
+            try {
+                pilihan = input.nextInt();
+                input.nextLine();
+            } catch (InputMismatchException e) {
+                System.out.println("Error: Masukkan pilihan berupa angka!");
+                input.nextLine();
+                pilihan = 0;
+            }
 
             switch (pilihan) {
 
@@ -63,15 +75,15 @@ public class SistemPenyewaanKamera {
                     break;
                     
                 case 7:
-                    System.out.print("Masukkan kode kamera: ");
-                    String kode = input.nextLine();
-
-                    for (int i = 0; i < jumlahKamera; i++) {
-                        if (daftarKamera[i].getKode().equalsIgnoreCase(kode)) {
-                        prosesKamera(daftarKamera[i]);
+                    simulasiKamera();
                     break;
-                        }
-                    }
+
+                case 8:
+                    menuPelanggan();
+                    break;
+
+                case 9:
+                    cekKamera();
                     break;
 
                 default:
@@ -83,54 +95,139 @@ public class SistemPenyewaanKamera {
         input.close();
     }
 
+    static void tambahDataPelanggan() {
+        daftarPelanggan.put("P001", "Andi");
+        daftarPelanggan.put("P002", "Budi");
+        daftarPelanggan.put("P003", "Citra");
+    }
+
+    static void menuPelanggan() {
+        int pilihanPelanggan;
+
+        do {
+            System.out.println("\n========== MENU PELANGGAN ==========");
+            System.out.println("1. Tambah Pelanggan");
+            System.out.println("2. Cari Pelanggan");
+            System.out.println("3. Tampilkan Semua Pelanggan");
+            System.out.println("4. Kembali ke Menu Utama");
+            System.out.print("Pilih menu: ");
+
+            try {
+                pilihanPelanggan = input.nextInt();
+                input.nextLine();
+            } catch (InputMismatchException e) {
+                System.out.println("Error: Masukkan angka!");
+                input.nextLine();
+                pilihanPelanggan = 0;
+            }
+
+            switch (pilihanPelanggan) {
+                case 1:
+                    System.out.print("Masukkan ID pelanggan: ");
+                    String id = input.nextLine();
+                    if (daftarPelanggan.containsKey(id)) {
+                        System.out.println("ID pelanggan sudah digunakan!");
+                    } else {
+                        System.out.print("Masukkan nama pelanggan: ");
+                        String nama = input.nextLine();
+                        tambahPelanggan(id, nama);
+                    }
+                    break;
+                case 2:
+                    System.out.print("Masukkan ID pelanggan: ");
+                    cariPelanggan(input.nextLine());
+                    break;
+                case 3:
+                    tampilkanPelanggan();
+                    break;
+                case 4:
+                    System.out.println("Kembali ke menu utama.");
+                    break;
+                default:
+                    System.out.println("Pilihan tidak valid.");
+            }
+        } while (pilihanPelanggan != 4);
+    }
+
+    static void tambahPelanggan(String id, String nama) {
+        daftarPelanggan.put(id, nama);
+        System.out.println("Pelanggan berhasil ditambahkan!");
+    }
+
+    static void cariPelanggan(String id) {
+        if (daftarPelanggan.containsKey(id)) {
+            System.out.println("Nama pelanggan: " + daftarPelanggan.get(id));
+        } else {
+            System.out.println("Pelanggan tidak ditemukan!");
+        }
+    }
+
+    static void tampilkanPelanggan() {
+        System.out.println("\n========== DAFTAR PELANGGAN ==========");
+        if (daftarPelanggan.isEmpty()) {
+            System.out.println("Belum ada data pelanggan.");
+            return;
+        }
+        for (Map.Entry<String, String> data : daftarPelanggan.entrySet()) {
+            System.out.println("ID: " + data.getKey() + " | Nama: " + data.getValue());
+        }
+    }
+
     static void tambahDataAwal() {
 
-        daftarKamera[jumlahKamera++] =
+        daftarKamera.add(
                 new KameraDSLR(
                         "K001",
                         "Canon",
                         150000,
                         "Full Frame"
-                );
+                )
+        );
 
-        daftarKamera[jumlahKamera++] =
+        daftarKamera.add(
                 new KameraDSLR(
                         "K002",
                         "Nikon",
                         175000,
                         "APS-C"
-                );
+                )
+        );
 
-        daftarKamera[jumlahKamera++] =
+        daftarKamera.add(
                 new KameraMirrorLess(
                         "K003",
                         "Sony",
                         200000,
                         "24 MP"
-                );
+                )
+        );
 
-        daftarKamera[jumlahKamera++] =
+        daftarKamera.add(
                 new KameraMirrorLess(
                         "K004",
                         "Fujifilm",
                         180000,
                         "26 MP"
-                );
+                )
+        );
 
-        daftarKamera[jumlahKamera++] =
+        daftarKamera.add(
                 new KameraAction(
                         "K005",
                         "GoPro",
                         125000,
                         true
-                );
-        daftarKamera[jumlahKamera++] =
-        new KameraCinema(
-                "K009",
-                "Sony FX3",
-                350000,
-                "4K"
+                )
         );
+        
+        daftarKamera.add(
+                new KameraCinema(
+                        "K009",
+                        "Sony FX3",
+                        350000,
+                        "4K"
+                )
+        );       
     }
 
     static void tambahKamera() {
@@ -138,10 +235,7 @@ public class SistemPenyewaanKamera {
         System.out.println();
         System.out.println("========== TAMBAH KAMERA ==========");
 
-        if (jumlahKamera >= daftarKamera.length) {
-            System.out.println("Penyimpanan kamera sudah penuh.");
-            return;
-        }
+        
 
         System.out.print("Kode kamera      : ");
         String kode = input.nextLine();
@@ -237,8 +331,7 @@ public class SistemPenyewaanKamera {
                 return;
         }
 
-        daftarKamera[jumlahKamera] = kameraBaru;
-        jumlahKamera++;
+        daftarKamera.add(kameraBaru);
 
         System.out.println();
         System.out.println(
@@ -253,7 +346,7 @@ public class SistemPenyewaanKamera {
                 "=============== DAFTAR KAMERA ==============="
         );
 
-        if (jumlahKamera == 0) {
+        if (daftarKamera.isEmpty()) {
 
             System.out.println(
                     "Belum ada data kamera."
@@ -276,10 +369,10 @@ public class SistemPenyewaanKamera {
                 "-------------------------------------------------------------------------------"
         );
 
-        for (int i = 0; i < jumlahKamera; i++) {
+        for (int i = 0; i < daftarKamera.size(); i++) {
 
             // Memanggil method overriding
-            daftarKamera[i].tampilkanInfo();
+            daftarKamera.get(i).tampilkanInfo();
         }
 
         System.out.println();
@@ -329,13 +422,13 @@ public class SistemPenyewaanKamera {
 
         boolean ditemukan = false;
 
-        for (int i = 0; i < jumlahKamera; i++) {
+        for (int i = 0; i < daftarKamera.size(); i++) {
 
-            if (daftarKamera[i]
+            if (daftarKamera.get(i)
                     .getKode()
                     .equalsIgnoreCase(kode)) {
 
-                daftarKamera[i].tampilkanInfo();
+                daftarKamera.get(i).tampilkanInfo();
 
                 ditemukan = true;
             }
@@ -355,13 +448,13 @@ public class SistemPenyewaanKamera {
 
         boolean ditemukan = false;
 
-        for (int i = 0; i < jumlahKamera; i++) {
+        for (int i = 0; i < daftarKamera.size(); i++) {
 
-            if (daftarKamera[i]
+            if (daftarKamera.get(i)
                     .getMerk()
                     .equalsIgnoreCase(merk)) {
 
-                daftarKamera[i].tampilkanInfo();
+                daftarKamera.get(i).tampilkanInfo();
 
                 ditemukan = true;
             }
@@ -387,13 +480,13 @@ public class SistemPenyewaanKamera {
 
         Kamera kamera = null;
 
-        for (int i = 0; i < jumlahKamera; i++) {
+        for (int i = 0; i < daftarKamera.size(); i++) {
 
-            if (daftarKamera[i]
+            if (daftarKamera.get(i)
                     .getKode()
                     .equalsIgnoreCase(kode)) {
 
-                kamera = daftarKamera[i];
+                kamera = daftarKamera.get(i);
 
                 break;
             }
@@ -506,15 +599,15 @@ public class SistemPenyewaanKamera {
 
         String kode = input.nextLine();
 
-        for (int i = 0; i < jumlahKamera; i++) {
+        for (int i = 0; i < daftarKamera.size(); i++) {
 
-            if (daftarKamera[i]
+            if (daftarKamera.get(i)
                     .getKode()
                     .equalsIgnoreCase(kode)) {
 
-                if (daftarKamera[i].isTersedia()) {
+                if (daftarKamera.get(i).isTersedia()) {
 
-                    daftarKamera[i]
+                    daftarKamera.get(i)
                             .setTersedia(false);
 
                     System.out.println(
@@ -523,7 +616,7 @@ public class SistemPenyewaanKamera {
 
                 } else {
 
-                    daftarKamera[i]
+                    daftarKamera.get(i)
                             .setTersedia(true);
 
                     System.out.println(
@@ -564,11 +657,11 @@ public class SistemPenyewaanKamera {
         System.out.print("Masukkan kode kamera: ");
         String kode = input.nextLine();
 
-        for (int i = 0; i < jumlahKamera; i++) {
+        for (int i = 0; i < daftarKamera.size(); i++) {
 
-            if (daftarKamera[i].getKode().equalsIgnoreCase(kode)) {
+            if (daftarKamera.get(i).getKode().equalsIgnoreCase(kode)) {
 
-                prosesKamera(daftarKamera[i]);
+                prosesKamera(daftarKamera.get(i));
 
                 return;
             }
@@ -576,4 +669,42 @@ public class SistemPenyewaanKamera {
 
         System.out.println("Kamera tidak ditemukan.");
     }
+    
+        
+    static void cekKamera() {
+        try {
+            System.out.print("Masukkan kode kamera: ");
+            String kode = input.nextLine();
+            Kamera kamera = cariKameraDenganException(kode);
+            System.out.println("Kamera ditemukan:");
+            kamera.tampilkanInfo();
+        } catch (KameraException e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            System.out.println("Proses pencarian kamera selesai.");
+        }
+    }
+
+    static Kamera cariKameraDenganException(String kode) throws KameraException {
+
+        if (kode == null || kode.trim().isEmpty()) {
+            throw new KameraException(
+                "Kode kamera tidak boleh kosong!"
+            );
+        }
+
+        for (int i = 0; i < daftarKamera.size(); i++) {
+
+            if (daftarKamera.get(i).getKode()
+                    .equalsIgnoreCase(kode)) {
+
+                return daftarKamera.get(i);
+            }
+        }
+
+        throw new KameraException(
+            "Kamera dengan kode " + kode + " tidak ditemukan!"
+        );
+    }
+
 }
